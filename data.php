@@ -15,6 +15,13 @@ if ($conn->connect_error) {
     exit;
 }
 
+$checkTable = "CREATE TABLE IF NOT EXISTS astroglide (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+$result = $conn->query($checkTable);
+
 function isValidName($name) {
     return preg_match('/^[a-zA-Z0-9_]{1,20}$/', $name);
 }
