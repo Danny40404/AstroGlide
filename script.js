@@ -1,3 +1,6 @@
+let windowWidth = window.clientWidth;
+let windowHeight = window.clientHeight;
+
 let spieler = document.querySelector(".player");
 let main = document.querySelector(".main");
 let spielerWidth = spieler.clientWidth;
@@ -6,12 +9,9 @@ let topPos = 0;
 let stepUp = 100;
 let fallstep = 1;
 let fallmulti = 1.05;
-let maxFallSpeed = 10;
+let maxFallSpeed = 15;
 let springen = 20;
 let isJumping = false;
-
-let windowWidth = window.clientWidth;
-let windowHeight = window.clientHeight;
 
 let scoreContainer = document.querySelector(".score");
 let scorePoints = scoreContainer.querySelector(".points");
@@ -20,6 +20,7 @@ let startScore = true;
 
 let menu1 = document.querySelector(".start-screen");
 let menu2 = document.querySelector(".end-screen");
+let menu3 = document.querySelector(".ranglist-screen");
 
 let levels;
 let random;
@@ -32,20 +33,26 @@ let containerHeight = container.clientHeight;
 let footerHeight = containerHeight * 0.1;
 let maxTop = containerHeight - footerHeight - spielerHeight;
 
+spieler.style.top = containerHeight / 2 + "px";
+speed = 0.33;
 let pipesInterval;
 let fallInterval;
 let moveInterval;
 let kollissionInterval;
 let scoreInterval;
 
-
 menu2.classList.add("hidden");
+menu3.classList.add("hidden");
+
 startButton = menu1.querySelector(".play-button");
-resetButton = menu2.querySelector(".reset-button");
+let restartButton = document.querySelector(".restart-button");
+ranglistButton = document.querySelector(".ranglist-button");
 
 if (!play) {
     startButton.addEventListener("click", function() {
         menu1.classList.add("hidden");
+        menu3.classList.add("hidden");
+
         play = true;
         fallInterval = setInterval(fall, (1000/60));
         pipesInterval = setInterval(pipes, 1500);
@@ -67,24 +74,20 @@ if (!play) {
     })
 }
 
-resetButton.addEventListener("click", function () {
-    
-    
-
+restartButton.addEventListener("click", function () {
     clearInterval(fallInterval);
     clearInterval(pipesInterval);
     clearInterval(moveInterval);
     
     scorePoints.innerHTML = 0;
+    currentScore = 0;
 
-    if (vorhandenePipes) {
-        main.removeChild(vorhandenePipes[0]);
-    }
+    let vorhandenePipes = document.querySelectorAll(".pipes");
+    vorhandenePipes.forEach(pipe => pipe.remove());
 
-    topPos = 0;
-    fallstep = 1;
-    play = true;
+    topPos = containerHeight / 2;
     spieler.style.top = topPos + "px";
+    fallstep = 1;
     play = true;
 
     menu2.classList.add("hidden");
@@ -95,6 +98,12 @@ resetButton.addEventListener("click", function () {
     kollissionInterval = setInterval(kollission, (1000/60));
 });
 
+ranglistButton.addEventListener("click", function () {
+    menu1.classList.add("hidden");
+    menu2.classList.add("hidden");
+    menu3.classList.remove("hidden");
+});
+
 function pipes() {
     let main = document.querySelector(".main");
     let vorhandenePipes = main.querySelectorAll(".pipes");
@@ -103,6 +112,8 @@ function pipes() {
         let pipes = document.createElement("div");
         let pipe1 = document.createElement("div");
         let pipe2 = document.createElement("div");
+        let pipe3 = document.createElement("div");
+        let pipe4 = document.createElement("div");
 
         if (vorhandenePipes.length > 4) {
             main.removeChild(vorhandenePipes[0]);
@@ -111,9 +122,14 @@ function pipes() {
         main.appendChild(pipes);
         pipes.appendChild(pipe1);
         pipes.appendChild(pipe2);
+        pipe1.appendChild(pipe3);
+        pipe2.appendChild(pipe4);
+
         pipes.classList.add("pipes");
         pipe1.classList.add("pipe-top");
         pipe2.classList.add("pipe-bottom");
+        pipe3.classList.add("pipe-lip");
+        pipe4.classList.add("pipe-lip");
 
         random = Math.floor(Math.random() * 6);
 
@@ -178,7 +194,7 @@ function movePipes() {
 
     vorhandenePipes.forEach(pipe => {
         let pipeRight = parseFloat(pipe.style.right || 0);
-        pipeRight = pipeRight + 0.66;
+        pipeRight = pipeRight + speed;
         pipe.style.right = pipeRight + "%";
     });
 }
@@ -230,4 +246,34 @@ function score(a) {
     }
     
     scorePoints.innerHTML = currentScore;
+    level(currentScore);
 }
+
+function level(currentScore) {
+    speed = 0.33 * (currentScore / 100 + 1);
+}
+
+function createStars(starCount = 50) {
+    const main = document.querySelector('.main');
+
+    for (let i = 0; i < starCount; i++) {
+        const star = document.createElement('div');
+        star.classList.add('star');
+
+        // Größe zufällig 2 bis 5 px
+        const size = Math.random() * 3 + 2;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+
+        // Position zufällig (in Prozent)
+        star.style.top = Math.random() * 100 + '%';
+        star.style.left = Math.random() * 100 + '%';
+
+        // Animationsverzögerung zufällig (damit Sterne nicht synchron flackern)
+        star.style.animationDelay = (Math.random() * 3) + 's';
+
+        main.appendChild(star);
+    }
+}
+
+createStars(70);

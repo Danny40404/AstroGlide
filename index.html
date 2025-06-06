@@ -1,24 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird</title>
+    <title>Astro Glide</title>
     <link rel="stylesheet" href="styles.css">
     <script src="script.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="main">
         <div class="start-screen">
+            <p>Astro Glide</p>
             <div class="play-button"></div>
+            <div class="ranglist-button">
+                <img class="podium" src="./images/podium.svg" alt="podium">
+            </div>
         </div>
+
+        <div class="pipes profil-1">
+            <div class="pipe-top">
+            </div>
+            <div class="pipe-bottom">
+            </div>
+        </div>
+
         <div class="score"><p class="points">0</p></div>
-        <div class="player"></div>
-        <div class="end-screen">
-            <div class="end-score"></div>
-            <div class="reset-button"></div>
+
+        <div class="player">
+            <!--
+            <span class="pupil"></span>
+            <div class="wing"></div>
+            -->
+            <div class="glass">
+                <div class="alien-eyes"></div>
+            </div>
+            <div class="lights">
+                <span></span><span></span><span></span>
+            </div>
         </div>
-        <div class="footer"></div>
+
+        <div class="end-screen">
+            <p>Game Over</p>
+            <div class="restart-button">
+                <img src="./images/refresh.png" alt="refresh">
+            </div>
+            <div class="ranglist-button">
+                <img class="podium" src="./images/podium.svg" alt="podium">
+            </div>
+        </div>
+        <div class="ranglist-screen">
+
+        </div>
+        <div class="footer">
+            <div class="crater"></div>
+            <div class="footer-content">
+                © 2025 Astro Glide
+            </div>
+        </div>
     </div>
 </body>
 </html>
