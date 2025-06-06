@@ -139,10 +139,10 @@
             } else {
                 openMenu = 'end';
             }
-
             menu1.classList.add("hidden");
             menu2.classList.add("hidden");
             menu3.classList.remove("hidden");
+            updateScoreBoard();
         });
     });
 
@@ -429,7 +429,6 @@
                         messageElement.classList.add("success");
                         messageElement.classList.remove("hidden");
                         send = false;
-                    return;
                         return true;
                     }
                 } catch (e) {
