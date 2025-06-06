@@ -3,6 +3,15 @@
     50% { opacity: 0.5; }
 }
 
+@keyframes galaxy {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(-360deg);
+    }
+}
+
 @keyframes fly-away {
     0% {
         transform: rotate(0deg) translateY(0);
@@ -65,13 +74,26 @@ body {
     overflow: hidden;
     margin: auto;
 
-    .star {
+    .stars {
+        animation: galaxy 120s linear infinite;
+        height: 150vh;
+        aspect-ratio: 1;
+        width: auto;
         position: absolute;
-        background: white;
+        left: 50%;
+        top: 50%;
+        transform-origin: center center;
         border-radius: 50%;
-        opacity: 1;
-        animation: twinkle 3s infinite ease-in-out alternate;
-        z-index: 1;
+        overflow: hidden;
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            opacity: 1;
+            animation: twinkle 3s infinite ease-in-out alternate;
+            z-index: 1;
+        }
     }
 
     .score {

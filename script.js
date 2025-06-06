@@ -139,10 +139,10 @@
             } else {
                 openMenu = 'end';
             }
+
             menu1.classList.add("hidden");
             menu2.classList.add("hidden");
             menu3.classList.remove("hidden");
-            updateScoreBoard();
         });
     });
 
@@ -334,7 +334,7 @@
         pipesDelay = Math.max(maxPipesDelay, pipesDelay - scoreValue * 150);
     }
 
-    function createStars(starCount = 50) {
+    function createStars(starCount = 200) {
         const main = document.querySelector('.main');
         let maxStarSize;
 
@@ -345,6 +345,8 @@
         } else {
             maxStarSize = 0.15;
         }
+        wrap = document.createElement('div');
+        wrap.classList.add("stars");
 
         for (let i = 0; i < starCount; i++) {
             const star = document.createElement('div');
@@ -359,7 +361,8 @@
             star.style.animationDelay = (Math.random() * 3) + 's';
             star.style.boxShadow = `0 0 ${size * 2}vw white`;
 
-            main.appendChild(star);
+            main.appendChild(wrap);
+            wrap.appendChild(star);
         }
     }
 
@@ -429,6 +432,7 @@
                         messageElement.classList.add("success");
                         messageElement.classList.remove("hidden");
                         send = false;
+                    return;
                         return true;
                     }
                 } catch (e) {
