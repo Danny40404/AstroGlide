@@ -6,6 +6,7 @@ AstroGlide ist ein schnelles und spannendes Browser-Spiel, bei dem du deine Gesc
 
 ## Features
 
+- Speicherung von Spielernamen und Punktzahlen in MySQL
 - Einfaches und intuitives Gameplay
 - Highscore-System mit Echtzeit-Punkte-Speicherung
 - Schutz vor unerwünschten oder anstößigen Spielernamen durch eine umfassende Blacklist
@@ -16,14 +17,17 @@ AstroGlide ist ein schnelles und spannendes Browser-Spiel, bei dem du deine Gesc
 
 ## Installation & Nutzung
 
-1. **Server vorbereiten:**
+1. **Datenbank einrichten:**
 
-   - Stelle sicher, dass dein Webserver PHP unterstützt.
-   - Lege eine MySQL-Datenbank namens `astroglide` an.
-   - Erstelle eine Tabelle `astroglide` mit den Spalten:
-     - `Name` (VARCHAR)
-     - `Score` (INT)
-     - `Datum` (DATETIME)
+   Erstelle eine MySQL-Datenbank (z.B. `astroglide`) und füge folgende Tabelle hinzu:
+
+   ```sql
+   CREATE TABLE IF NOT EXISTS astroglide (
+       id INT AUTO_INCREMENT PRIMARY KEY,
+       name VARCHAR(255) NOT NULL,
+       score INT NOT NULL,
+       datum DATETIME NOT NULL
+   );
 
 2. **Konfiguration:**
 
