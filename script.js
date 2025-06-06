@@ -1,4 +1,12 @@
 (function() {
+    const originalgetBoundingClientRect = Element.prototype.getBoundingClientRect;
+    Object.defineProperty(Element.prototype, "getBoundingClientRect", {
+        value: originalgetBoundingClientRect, configurable: false, writable: false
+    })
+
+    const topArray = ["45%", "40%", "55%", "35%", "25%", "60%"];
+    const bottomArray = ["55%", "60%", "45%", "65%", "75%", "40%"];
+    const className = "profil-6";
     let spieler = document.querySelector(".player");
     let spielerHeight = spieler.clientHeight;
     let topPos = 0;
@@ -6,6 +14,7 @@
     let fallstep = 1;
     let fallmulti = 1.05;
     let maxFallSpeed = 15;
+    let windowWidth = window.innerWidth;
 
     let scoreContainer = document.querySelector(".score");
     let scorePoints = scoreContainer.querySelector(".points");
@@ -20,7 +29,7 @@
     let random;
     let profil;
     let play = false;
-    let send = false;
+    let send = true;
 
     let container = document.querySelector(".main");
     let containerHeight = container.clientHeight;
@@ -28,11 +37,16 @@
     let maxTop = containerHeight - footerHeight - spielerHeight;
 
     spieler.style.top = containerHeight / 2 + "px";
-    let speed = 0.33;
+    let speed = 3;
     let pipesInterval;
+    let pipesDelay = 2500;
+    let maxPipesDelay = pipesDelay / 2;
+    let reducePipesDelay = 0;
     let fallInterval;
     let moveInterval;
     let kollissionInterval;
+    let lastPipe = 0;
+    let path = "/AstroGlide/";
 
     menu2.classList.add("hidden");
     menu3.classList.add("hidden");
@@ -52,7 +66,7 @@
             play = true;
             currentScore = 0;
             fallInterval = setInterval(fall, (1000/60));
-            pipesInterval = setInterval(pipes, 1500);
+            pipesInterval = setInterval(pipes, (1000/60));
             moveInterval = setInterval(movePipes, (1000/60));
             kollissionInterval = setInterval(kollission, (1000/60));
 
@@ -96,16 +110,16 @@
         vorhandenePipes.forEach(pipe => pipe.remove());
 
         fallstep = 1;
-        speed = 0.33;
+        speed = 3;
         play = true;
-        send = false;
+        send = true;
 
         spieler.classList.remove("fly-away");
         menu2.classList.add("hidden");
         scoreContainer.classList.remove("hidden");
 
         fallInterval = setInterval(fall, 1000 / 60);
-        pipesInterval = setInterval(pipes, 1500);
+        pipesInterval = setInterval(pipes, pipesDelay);
         moveInterval = setInterval(movePipes, (1000/60));
         kollissionInterval = setInterval(kollission, (1000/60));
 
@@ -145,7 +159,7 @@
     })
     
     saveButton.addEventListener("click", function () {
-        if (!play && !send) {
+        if (!play && send) {
             let punkte = currentScore;
             let name = document.querySelector("#player-name").value;
             const messageElement = document.querySelector(".save-message");
@@ -158,97 +172,56 @@
                 messageElement.textContent = "Bitte einen Namen eingeben.";
                 messageElement.classList.add("error");
                 messageElement.classList.remove("hidden");
-                send = false;
                 return;
+            } 
+            else{
+                sendeScore(name, punkte);
             }
-
-            $.ajax({
-                type: "POST",
-                url: "http://localhost/AstroGlide/data.php",
-                data: {
-                    dataname: name,
-                    datapunkte: punkte
-                },
-                dataType: "json",
-                success: function (response) {
-                    messageElement.textContent = "Punkte erfolgreich gespeichert!";
-                    messageElement.classList.add("success");
-                    messageElement.classList.remove("hidden");
-                    send = true;
-                    updateScoreBoard();
-                },
-                error: function () {
-                    messageElement.textContent = "Fehler beim Speichern. Bitte später erneut versuchen.";
-                    messageElement.classList.add("error");
-                    messageElement.classList.remove("hidden");
-                    send = false;
-                },
-            });
         }
     })
 
     function pipes() {
+        if (!play) return;
+
         let main = document.querySelector(".main");
         let vorhandenePipes = main.querySelectorAll(".pipes");
 
-        if (play) {
-            let pipes = document.createElement("div");
-            let pipe1 = document.createElement("div");
-            let pipe2 = document.createElement("div");
-            let pipe3 = document.createElement("div");
-            let pipe4 = document.createElement("div");
+        let now = Date.now();
+        let elapsed = now - lastPipe;
 
+        if (elapsed >= pipesDelay) {
             if (vorhandenePipes.length > 4) {
                 main.removeChild(vorhandenePipes[0]);
             }
 
-            main.appendChild(pipes);
-            pipes.appendChild(pipe1);
-            pipes.appendChild(pipe2);
-            pipe1.appendChild(pipe3);
-            pipe2.appendChild(pipe4);
+            let pipes = document.createElement("div");
+            let pipe1 = document.createElement("div");
+            let pipe2 = document.createElement("div");
 
             pipes.classList.add("pipes");
             pipe1.classList.add("pipe-top");
             pipe2.classList.add("pipe-bottom");
-            pipe3.classList.add("pipe-lip");
-            pipe4.classList.add("pipe-lip");
-
+            
             random = Math.floor(Math.random() * 6);
+            pipes.classList.add("profil-" + random);
 
-            switch (random) {
-                case 0:
-                    profil = "profil-0";
-                    break;
-                case 1:
-                    profil = "profil-1";        
-                    break;
-                case 2:
-                    profil = "profil-2";        
-                    break;
-                case 3:
-                    profil = "profil-3";        
-                    break;
-                case 4:
-                    profil = "profil-4";        
-                    break;
-                case 5:
-                    profil = "profil-5";        
-                    break;
-            }
+            pipe1.style.height = topArray[random];
+            pipe2.style.height = bottomArray[random];
 
-            pipes.classList.add(profil);
-        } else {
-            vorhandenePipes.forEach(pipe => {
-                main.removeChild(pipe);
-            });
+            pipes.appendChild(pipe1);
+            pipes.appendChild(pipe2);
+            main.appendChild(pipes);
+
+            lastPipe = now;
         }
-    };
+    }
 
     function fall() {
         if (topPos >= maxTop) {
             clearInterval(fallInterval);
             clearInterval(moveInterval);
+            clearInterval(pipesDelay);
+            clearInterval(reducePipesDelay);
             play = false;
             spieler.classList.add("fly-away");
             document.querySelector(".end-score .points").textContent = currentScore;
@@ -277,10 +250,28 @@
         let vorhandenePipes = main.querySelectorAll(".pipes");
         vorhandenePipes = Array.from(vorhandenePipes);
 
+        if (Element.prototype.getBoundingClientRect !== originalgetBoundingClientRect) {
+            location.reload;
+        }
+
         vorhandenePipes.forEach(pipe => {
             let pipeRight = parseFloat(pipe.style.right || 0);
             pipeRight = pipeRight + speed;
-            pipe.style.right = pipeRight + "%";
+            pipe.style.right = pipeRight + "px";
+
+            var pipeTop = pipe.querySelector(".pipe-top");
+            var pipeBottom = pipe.querySelector(".pipe-bottom");
+            var value = (pipe.classList.value);
+            value = parseInt(value.replace(/\D+/, ""));
+
+            if (value > topArray[topArray.length - 1] && value > bottomArray[bottomArray.length - 1]) {
+                pipe.remove();
+            } else {
+                if (pipeTop.style.height != topArray[value] || pipeBottom.style.height != bottomArray[value]) {
+                    pipe.remove();
+                    location.reload();
+                }
+            }
         });
     }
 
@@ -302,18 +293,20 @@
                 clearInterval(fallInterval);
                 clearInterval(moveInterval);
                 clearInterval(kollissionInterval);
+                clearInterval(pipesDelay);
+                clearInterval(reducePipesDelay);
                 spieler.classList.add("fly-away");
                 document.querySelector(".end-score .points").textContent = currentScore;
                 menu2.classList.remove("hidden");
                 scoreContainer.classList.add("hidden");
             }
-
+            
             if (isColliding(spielerBox, pipe.getBoundingClientRect()) && (!isColliding(spielerBox, pipeTopBox) && !isColliding(spielerBox, pipeBottomBox) && !isColliding(spielerBox, footerBox))) {
                 score(1);
+                level(0.04);
             }
         });
-
-    }
+    } 
 
     function isColliding(a, b) {
         const c1 = a;
@@ -334,17 +327,15 @@
         }
 
         scorePoints.innerHTML = currentScore;
-        level(currentScore);
     }
 
     function level(scoreValue) {
-        speed = 0.33 * (scoreValue / 100 + 1);
+        speed += scoreValue;
+        pipesDelay = Math.max(maxPipesDelay, pipesDelay - scoreValue * 150);
     }
 
     function createStars(starCount = 50) {
         const main = document.querySelector('.main');
-        const windowWidth = window.innerWidth;
-
         let maxStarSize;
 
         if (windowWidth < 768) {
@@ -375,7 +366,7 @@
     function scoreBoard() {
         $.ajax({
             type: "get",
-            url: "http://localhost/AstroGlide/data.php",
+            url: path + "data.php",
             success: function (response) {
                 response.forEach(element => {
                     li = document.createElement("li");
@@ -408,8 +399,49 @@
         scoreBoard();
     }
 
+    function balanceGame() {
+        let newPipesDelay = (100 / 1024 * windowWidth) / 100 * pipesDelay;
+    }
+
+    function sendeScore(name, punkte) {
+        const data = {
+            dataname: name,
+            datapunkte: punkte,
+            datamaxfallspeed: maxFallSpeed
+        };
+
+        $.ajax({
+            url: '/AstroGlide/data.php',
+            method: 'POST',
+            data: data,
+            success: function(response) {
+                const messageElement = document.querySelector(".save-message");
+                try {
+                    const res = typeof response === "string" ? JSON.parse(response) : response;
+
+                    if (res.status === "error") {
+                        messageElement.textContent = res.message;
+                        messageElement.classList.add("error");
+                        messageElement.classList.remove("hidden");
+                        return false;
+                    } else {
+                        messageElement.textContent = res.message;
+                        messageElement.classList.add("success");
+                        messageElement.classList.remove("hidden");
+                        send = false;
+                    return;
+                        return true;
+                    }
+                } catch (e) {
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+            }
+        });
+    }
 
     $(window).resize(function () { 
+        windowWidth = window.innerWidth;
         containerHeight = container.clientHeight;
         spielerHeight = spieler.clientHeight;
         footerHeight = containerHeight * 0.1;
@@ -417,6 +449,8 @@
         refreshPlayer();
     });
 
+    balanceGame();
     createStars(70);
     scoreBoard();
+
 })();
