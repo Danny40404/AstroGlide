@@ -5,17 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Astro Glide</title>
     <link rel="stylesheet" href="styles.css">
+    <script src="libs.js" defer></script>
     <script src="script.js" defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="main">
+    <main class="main">
         <div class="start-screen">
-            <p>Astro Glide</p>
-            <div class="play-button"></div>
-            <div class="ranglist-button">
-                <img class="podium" src="./images/podium.svg" alt="podium">
+            <h1>Astro Glide</h1>
+            <div class="buttons">
+                <div class="play-button">
+                    <img class="play" src="./images/play.svg" alt="play">
+                </div>
+                <div class="ranglist-button">
+                    <img class="podium" src="./images/podium.svg" alt="podium">
+                </div>
             </div>
+            <p class="hinweis">Drücke Leertaste oder linke Maustaste um zu springen</p>
         </div>
 
         <div class="pipes profil-1">
@@ -25,13 +31,11 @@
             </div>
         </div>
 
-        <div class="score"><p class="points">0</p></div>
+        <div class="score">
+            <p class="points">0</p>
+        </div>
 
         <div class="player">
-            <!--
-            <span class="pupil"></span>
-            <div class="wing"></div>
-            -->
             <div class="glass">
                 <div class="alien-eyes"></div>
             </div>
@@ -41,23 +45,41 @@
         </div>
 
         <div class="end-screen">
-            <p>Game Over</p>
-            <div class="restart-button">
-                <img src="./images/refresh.png" alt="refresh">
+            <h1>Game Over</h1>
+            <div class="end-score">
+                <p class="points">0</p>
             </div>
-            <div class="ranglist-button">
-                <img class="podium" src="./images/podium.svg" alt="podium">
+            <div class="input-field-container">
+                <p class="input-description">
+                    Gib deinen Benutzernamen ein und speichere deinen Score in der Rangliste!
+                </p>
+                <div class="input-field">
+                    <input type="text" id="player-name" placeholder="Benutzername">
+                </div>
+                <div class="save-button">Speichern</div>
+                <p class="save-message hidden"></p>
+            </div>
+            <div class="buttons">
+                <div class="restart-button">
+                    <img src="./images/refresh.svg" alt="refresh">
+                </div>
+                <div class="ranglist-button">
+                    <img class="podium" src="./images/podium.svg" alt="podium">
+                </div>
             </div>
         </div>
         <div class="ranglist-screen">
-
+            <div class="close-button">
+                <img src="./images/cross.svg" alt="cross">
+            </div>
+            <ol class="ranglist"></ol>
         </div>
         <div class="footer">
-            <div class="crater"></div>
-            <div class="footer-content">
-                © 2025 Astro Glide
-            </div>
+        <div class="crater"></div>
+        <div class="footer-content">
+            © 2025 Astro Glide
         </div>
     </div>
+    </main>
 </body>
 </html>
