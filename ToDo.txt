@@ -1,0 +1,9 @@
+X Pipes Struktur mit den Klassen
+X Spieler selektieren
+X Funktion gravitation (timeout)
+X Sprung Funktion (Abfrage Leertaste) - Top Wert subtrahieren
+X Ende - Pipes verschwinden / End Screen
+Pipes bewegen / aktualisieren
+Kollision (getBoundingClient)
+Rangliste / Score
+Schwierigkeitsgrad: Pipes ändern sich / Geschwindigkeit ändert sich

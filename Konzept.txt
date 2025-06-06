@@ -1,0 +1,18 @@
+Hindernisse: Rohre
+Spieler: Vogel
+Score: pro durchflogene Pipe einen Punkt
+Steuerung: Linksklick oder Leertaste - nach oben
+Gravitation: konstante Fallgeschwindigkeit
+Spielende: Wenn Pipe berührt wurde
+Punkteanzeige: oben mittig
+Start: Play Symbol mittig vom Bildschirm
+Erneuter Versuch: Bei erneutem Spielstart Reset Button mittig vom Bildschirm
+
+Schwierigkeitsstufen
+0–10 Punkte	2 px/frame	Standard (große Lücken, normale Geschwindigkeit)	
+10–20 Punkte	3 px/frame	Lücken kleiner
+20–30 Punkte	4 px/frame	Noch kleinere Lücken
+
+Geschwindigkeit: 
+set interval
+distanz
