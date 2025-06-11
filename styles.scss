@@ -5,36 +5,12 @@
 
 @keyframes galaxy {
     0% {
-        transform: translate(-50%, -50%) rotate(0deg);
+        transform: translate(-50%, -50%) rotateZ(0deg);
     }
     100% {
-        transform: translate(-50%, -50%) rotate(-360deg);
+        transform: translate(-50%, -50%) rotateZ(-360deg);
     }
 }
-
-@keyframes fly-away {
-    0% {
-        transform: rotate(0deg) translateY(0);
-        opacity: 1;
-    }
-    50% {
-        transform: rotate(180deg) translateY(-100px);
-        opacity: 0.7;
-    }
-    100% {
-        transform: rotate(360deg) translateY(-1000px);
-        opacity: 0;
-    }
-}
-
-@keyframes float {
-        0%, 100% {
-            transform: translateY(0) translateX(-50%);
-        }
-        50% {
-            transform: translateY(-5px) translateX(-50%);
-        }
-    }
 
 @keyframes blink {
     0% {
@@ -130,7 +106,7 @@ body {
             display: flex;
             justify-content: center;
             bottom: 25%;
-            aspect-ratio: 4 / 1;
+            aspect-ratio: 4 / 1 !important;
             padding: 2%;
 
             &:hover {
@@ -139,7 +115,8 @@ body {
 
             img {
                 width: 100%;
-                height: auto;
+                height: 100%;
+                object-fit: contain;
             }
         }
     }
@@ -417,12 +394,13 @@ body {
         min-height: 15px;
         background: linear-gradient(to right, #888, #aaa);
         border-radius: 50% / 100%;
-        animation: float 1.2s ease-in-out infinite;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
         transition: 50ms;
         left: 50%;
-        transform: translateX(50%);
+        transform: translateX(-50%);
+        
         z-index: 2;
+        transition: transform 0.2s ease-out;
 
         @media (max-width: 768px) {
             left: 15%;
@@ -451,10 +429,6 @@ body {
                 border-radius: 50%;
                 z-index: 2;
             }
-        }
-
-        &.fly-away {
-            animation: fly-away 1.2s ease-in forwards;
         }
 
         .lights {

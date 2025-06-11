@@ -1,5 +1,6 @@
 (function() {
     const originalgetBoundingClientRect = Element.prototype.getBoundingClientRect;
+
     Object.defineProperty(Element.prototype, "getBoundingClientRect", {
         value: originalgetBoundingClientRect, configurable: false, writable: false
     })
@@ -9,8 +10,8 @@
     const className = "profil-6";
     let spieler = document.querySelector(".player");
     let spielerHeight = spieler.clientHeight;
-    let topPos = 0;
     let stepUp = 100;
+    let playerTranslateY = 0;
     let fallstep = 1;
     let fallmulti = 1.05;
     let maxFallSpeed = 15;
@@ -27,16 +28,16 @@
     let openMenu = null;
 
     let random;
-    let profil;
     let play = false;
     let send = true;
 
     let container = document.querySelector(".main");
     let containerHeight = container.clientHeight;
     let footerHeight = containerHeight * 0.1;
-    let maxTop = containerHeight - footerHeight - spielerHeight;
-
-    spieler.style.top = containerHeight / 2 + "px";
+    let maxTop = containerHeight - footerHeight;
+    let footerBox = document.querySelector(".footer");
+    
+    
     let speed = 3;
     let pipesInterval;
     let pipesDelay = 2500;
@@ -47,6 +48,10 @@
     let kollissionInterval;
     let lastPipe = 0;
     let path = "/AstroGlide/";
+
+    playerTranslateY = containerHeight / 2;
+    spieler.style.transform = `translate(-50%, ${playerTranslateY}px)`;
+    footerBox = footerBox.getBoundingClientRect();
 
     menu2.classList.add("hidden");
     menu3.classList.add("hidden");
@@ -84,7 +89,7 @@
             });
 
             window.addEventListener("touchstart", function(e) {
-                if (play) {
+                if (play && e.target.closest(".main") || e.target.closest(".player")) {
                     e.preventDefault();
                     jump();
                 }
@@ -93,43 +98,20 @@
     }
     
     function refreshPlayer() {
-        topPos = containerHeight / 2;
-        spieler.style.top = topPos + "px";
+        playerTranslateY = containerHeight / 2;
+        spieler.style.transform = `translate(-50%, ${playerTranslateY}px)`;
     }
 
     restartButton.addEventListener("click", function () {
-        clearInterval(fallInterval);
-        clearInterval(pipesInterval);
-        clearInterval(moveInterval);
-        refreshPlayer();
+        const url = new URL(window.location.href);
 
-        scorePoints.innerHTML = 0;
-        currentScore = 0;
-
-        let vorhandenePipes = document.querySelectorAll(".pipes");
-        vorhandenePipes.forEach(pipe => pipe.remove());
-
-        fallstep = 1;
-        speed = 3;
-        play = true;
-        send = true;
-
-        spieler.classList.remove("fly-away");
-        menu2.classList.add("hidden");
-        scoreContainer.classList.remove("hidden");
-
-        fallInterval = setInterval(fall, 1000 / 60);
-        pipesInterval = setInterval(pipes, pipesDelay);
-        moveInterval = setInterval(movePipes, (1000/60));
-        kollissionInterval = setInterval(kollission, (1000/60));
-
-        const messageElement = document.querySelector(".save-message");
-        messageElement.textContent = "";
-        messageElement.classList.remove("success", "error");
-        messageElement.classList.add("hidden");
-        inputDescription.classList.remove("hidden");
-
-        updateScoreBoard();
+        if (!url.searchParams.has("?start")) {
+            url.searchParams.set("start", "auto");
+            window.location.href = url.toString();
+        } else {
+            location.reload();
+        }
+        return;
     });
 
     ranglistButton.forEach(button => {
@@ -180,6 +162,8 @@
         }
     })
 
+    
+
     function pipes() {
         if (!play) return;
 
@@ -217,32 +201,21 @@
     }
 
     function fall() {
-        if (topPos >= maxTop) {
-            clearInterval(fallInterval);
-            clearInterval(moveInterval);
-            clearInterval(pipesDelay);
-            clearInterval(reducePipesDelay);
-            play = false;
-            spieler.classList.add("fly-away");
-            document.querySelector(".end-score .points").textContent = currentScore;
-            menu2.classList.remove("hidden");
-            scoreContainer.classList.add("hidden");
-        } else {
+        if (play) {
             fallstep = Math.min(fallstep * fallmulti, maxFallSpeed);
-            topPos += fallstep;
-            spieler.style.top = topPos + "px";
+            playerTranslateY += fallstep;
+            spieler.style.transform = `translate(-50%, ${playerTranslateY}px)`;
         }
     }
 
     function jump() {
         fallstep = 1;
 
-        topPos -= stepUp;
-        if (topPos < 0) {
-            topPos = 0;
+        playerTranslateY -= stepUp;
+        if (playerTranslateY < 0) {
+            playerTranslateY = 0;
         }
-
-        spieler.style.top = topPos + "px";
+        spieler.style.transform = `translate(-50%, ${playerTranslateY}px)`;
     }
 
     function movePipes() {
@@ -251,7 +224,7 @@
         vorhandenePipes = Array.from(vorhandenePipes);
 
         if (Element.prototype.getBoundingClientRect !== originalgetBoundingClientRect) {
-            location.reload;
+            location.reload();
         }
 
         vorhandenePipes.forEach(pipe => {
@@ -279,7 +252,6 @@
         let main = document.querySelector(".main");
         let vorhandenePipes = main.querySelectorAll(".pipes");
         spielerBox = spieler.getBoundingClientRect();
-        footerBox = document.querySelector(".footer").getBoundingClientRect();
         vorhandenePipes = Array.from(vorhandenePipes);
 
         vorhandenePipes.forEach(pipe => {
@@ -288,25 +260,27 @@
             let pipeTopBox = pipeTop.getBoundingClientRect();
             let pipeBottomBox = pipeBottom.getBoundingClientRect();
 
-            if (isColliding(spielerBox, pipeTopBox) || isColliding(spielerBox, pipeBottomBox) || isColliding(spielerBox, footerBox)) {
+            if (isColliding(spielerBox, pipeTopBox) || isColliding(spielerBox, pipeBottomBox) || isColliding(spielerBox, footerBox) || playerTranslateY >= maxTop) {
                 play = false;
+                playerTranslateY = maxTop;
+                spieler.style.transform = `translate(-50%, ${maxTop}px)`;
+
                 clearInterval(fallInterval);
                 clearInterval(moveInterval);
                 clearInterval(kollissionInterval);
                 clearInterval(pipesDelay);
                 clearInterval(reducePipesDelay);
-                spieler.classList.add("fly-away");
                 document.querySelector(".end-score .points").textContent = currentScore;
                 menu2.classList.remove("hidden");
                 scoreContainer.classList.add("hidden");
             }
-            
-            if (isColliding(spielerBox, pipe.getBoundingClientRect()) && (!isColliding(spielerBox, pipeTopBox) && !isColliding(spielerBox, pipeBottomBox) && !isColliding(spielerBox, footerBox))) {
+
+            if (isColliding(spielerBox, pipe.getBoundingClientRect()) && !isColliding(spielerBox, pipeTopBox) && !isColliding(spielerBox, pipeBottomBox) && !isColliding(spielerBox, footerBox)) {
                 score(1);
                 level(0.04);
             }
         });
-    } 
+    }
 
     function isColliding(a, b) {
         const c1 = a;
@@ -402,10 +376,6 @@
         scoreBoard();
     }
 
-    function balanceGame() {
-        let newPipesDelay = (100 / 1024 * windowWidth) / 100 * pipesDelay;
-    }
-
     function sendeScore(name, punkte) {
         const data = {
             dataname: name,
@@ -432,7 +402,7 @@
                         messageElement.classList.add("success");
                         messageElement.classList.remove("hidden");
                         send = false;
-                    return;
+                        updateScoreBoard();
                         return true;
                     }
                 } catch (e) {
@@ -448,12 +418,16 @@
         containerHeight = container.clientHeight;
         spielerHeight = spieler.clientHeight;
         footerHeight = containerHeight * 0.1;
-        maxTop = containerHeight - footerHeight - spielerHeight;
+        maxTop = containerHeight - footerHeight;
+        footerBox = document.querySelector(".footer");
+        footerBox = footerBox.getBoundingClientRect();
         refreshPlayer();
     });
 
-    balanceGame();
     createStars(70);
     scoreBoard();
 
+    if (new URLSearchParams(window.location.search).get("start") === "auto") {
+        startButton.click();
+    }
 })();
